@@ -33,8 +33,8 @@ const Chats = ({ dataChats }) => {
   const [user] = useAuthState(auth),
     href = window.location.href;
   let idFromHref;
-  if (href.includes("https://webrepose-chat.vercel.app")) {
-    idFromHref = href.replace("https://webrepose-chat.vercel.app/", "");
+  if (href.includes("https://diasmess.vercel.app/")) {
+    idFromHref = href.replace("https://diasmess.vercel.app/", "");
   } else idFromHref = href.replace("http://localhost:3000/", "");
   const [messages, loading] = useCollectionData(
       query(
