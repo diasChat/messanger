@@ -3,26 +3,62 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="chat"/>
+    <meta name="description" content="chat" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/img/logo.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="icon" href="../../../img/logo.png" type="image/x-icon">
-    <meta http-equiv="Cache-Control" content="max-age=31536000">
+    <link rel="icon" href="../../../img/logo.png" type="image/x-icon" />
+    <meta http-equiv="Cache-Control" content="max-age=31536000" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src-attr 'self';base-uri 'none';form-action 'self';object-src 'none';frame-src 'self';manifest-src 'self'; worker-src 'self';style-src-attr 'self' 'unsafe-inline';media-src 'self';upgrade-insecure-requests;"
+    />
+    <meta name="author" content="https://diasmess.vercel.app" />
+    <meta name="keywords" content="Chat IO, Messanger IO, Mees IO" />
+    <meta
+      name="description"
+      content="This a just messanger. Here you're can find friends and chat whith it all"
+    />
+    <meta
+      name="theme-color"
+      content="hsl(240, 3%, 11%)"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta
+      name="theme-color"
+      content="hsl(0, 0%, 100%)"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta name="apple-mobile-web-app-title" content="Chat IO" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Chat IO" />
+    <meta
+      property="og:description"
+      content="This a just messanger. Here you're can find friends and chat whith it all"
+    />
+    <meta property="og:image" content="../../../img/logo.png" />
+    <meta property="og:url" content="https://diasmess.vercel.app" />
+    <link rel="canonical" href="https://diasmess.vercel.app" />
+
     <title>Chat</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-   
+
     <script>
-      if('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-        .then(reg => console.log(reg.scope))
-      })
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((reg) => console.log(reg.scope));
+        });
       }
-    </script> 
+    </script>
   </body>
 </html>
