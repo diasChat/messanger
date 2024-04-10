@@ -26,6 +26,7 @@ const Chat_list = () => {
     [dataUserTwo, setDataUserTwo] = useState([]),
     [uids, setUids] = useState([]);
 
+  // Загрузка данных о чатах и сохраненных сообщениях
   useEffect(() => {
     if (Saved) {
       let d;
@@ -50,6 +51,7 @@ const Chat_list = () => {
     }
   }, [chatsAll, Saved, user.uid]);
 
+  // Удаление чата
   const DeleteChat = async (userTwoUID, value, value2) => {
     const q = query(
         collection(db, "users", user.uid, "chats", value, "messages")
@@ -75,10 +77,12 @@ const Chat_list = () => {
     await deleteDoc(doc(db, "users", userTwoUID, "chats", value2));
   };
 
+  // Отображение списка чатов и сохраненных сообщений
   if (loading) return <PreloaderChatList />;
 
   return (
     <nav>
+      {/* Отображение сохраненных сообщений */}
       {uids &&
         uids.map((data, id) => (
           <div key={id} className={Style.data_l}>
@@ -101,14 +105,12 @@ const Chat_list = () => {
                   <p className={Style.data_name}>Сохраненные сообщения</p>
                   <p className={Style.data_text}>{data.text}</p>
                 </div>
-                {/* <div className={Style.data_time}> */}
-                {/* <p>{DateFun(data.time)}</p> */}
-                {/* </div> */}
               </div>
             </NavLink>
           </div>
         ))}
 
+      {/* Отображение списка чатов */}
       {chatsAll &&
         chatsAll.map((data, id) => (
           <div className={Style.data_l} key={id}>

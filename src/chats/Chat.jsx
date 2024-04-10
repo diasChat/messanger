@@ -1,10 +1,10 @@
-import Section from "../UI_kit/Section";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useRef, useState, useEffect } from "react";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import Preloader from "../components/Preloaders/Preloader";
-import Style from "../styles/chat/chat.module.css";
-import { db, auth } from "../index";
+import Section from "../UI_kit/Section"; // Импорт компонента Section из UI_kита
+import { useAuthState } from "react-firebase-hooks/auth"; // Импорт хука useAuthState из react-firebase-hooks/auth
+import { useRef, useState, useEffect } from "react"; // Импорт useRef, useState, useEffect из react
+import { useCollectionData } from "react-firebase-hooks/firestore"; // Импорт хука useCollectionData из react-firebase-hooks/firestore
+import Preloader from "../components/Preloaders/Preloader"; // Импорт компонента Preloader из папки components/Preloaders
+import Style from "../styles/chat/chat.module.css"; // Импорт стилей из файла chat.module.css в папке styles/chat
+import { db, auth } from "../index"; // Импорт объектов db и auth из файла index в корне проекта
 import {
   Timestamp,
   orderBy,
@@ -16,7 +16,7 @@ import {
   query,
   updateDoc,
   getDoc,
-} from "firebase/firestore";
+} from "firebase/firestore"; // Импорт функций и объектов из firebase/firestore
 import {
   isURL,
   Consolidate,
@@ -26,16 +26,21 @@ import {
   Send,
   Pined,
   DateFun,
-} from "./Components";
-import ModalClose from "../components/ModalClose";
+} from "./Components"; // Импорт функций из файла Components в текущей директории
+import ModalClose from "../components/ModalClose"; // Импорт компонента ModalClose из папки components
 
+// Основной компонент Chats
 const Chats = ({ dataChats }) => {
-  const [user] = useAuthState(auth),
-    href = window.location.href;
+  const [user] = useAuthState(auth), // Получение текущего пользователя с помощью хука useAuthState
+    href = window.location.href; // Получение текущего URL
+
+  // Определение idFromHref в зависимости от URL
   let idFromHref;
   if (href.includes("https://diasmess.vercel.app/")) {
     idFromHref = href.replace("https://diasmess.vercel.app/", "");
   } else idFromHref = href.replace("http://localhost:3000/", "");
+
+  // Запрос сообщений и управление загрузкой
   const [messages, loading] = useCollectionData(
       query(
         collection(db, "users", dataChats, "chats", idFromHref, "messages"),
@@ -46,30 +51,33 @@ const Chats = ({ dataChats }) => {
       collection(db, "users", dataChats, "chats", idFromHref, "messages"),
       orderBy("createdAt", "asc")
     ),
-    bottomRef = useRef(null),
-    [value, setValue] = useState(""),
-    [valueRewrite, setValueRewrite] = useState(""),
-    [modalMessage, setModalMessage] = useState(false),
-    [idMessageList, setIdMessageList] = useState([]),
-    [idDoc, setIdDoc] = useState(),
-    [copyText, setCopyText] = useState(),
-    [uidModal, setUidModal] = useState(),
-    [modeType, setModeType] = useState(true),
-    [pined, setPined] = useState(""),
-    [pinedIdMessage, setPinedIdMessage] = useState(""),
-    [idMessage, setIdMessage] = useState(),
-    [togglePined, setTogglePined] = useState(false),
-    modalRef = useRef(null),
-    userUid1 = idFromHref.replace(dataChats, ""),
-    userUid2 = dataChats,
+    bottomRef = useRef(null), // Создание ref для прокрутки вниз
+    [value, setValue] = useState(""), // Стейт для значения сообщения
+    [valueRewrite, setValueRewrite] = useState(""), // Стейт для значения редактируемого сообщения
+    [modalMessage, setModalMessage] = useState(false), // Стейт для модального окна
+    [idMessageList, setIdMessageList] = useState([]), // Стейт для списка id сообщений
+    [idDoc, setIdDoc] = useState(), // Стейт для id документа
+    [copyText, setCopyText] = useState(), // Стейт для копируемого текста
+    [uidModal, setUidModal] = useState(), // Стейт для uid модального окна
+    [modeType, setModeType] = useState(true), // Стейт для типа модального окна
+    [pined, setPined] = useState(""), // Стейт для закрепленного сообщения
+    [pinedIdMessage, setPinedIdMessage] = useState(""), // Стейт для id закрепленного сообщения
+    [idMessage, setIdMessage] = useState(), // Стейт для id сообщения
+    [togglePined, setTogglePined] = useState(false), // Стейт для переключения закрепленного сообщения
+    modalRef = useRef(null), // Создание ref для модального окна
+    userUid1 = idFromHref.replace(dataChats, ""), // Получение uid пользователя 1
+    userUid2 = dataChats, // Получение uid пользователя 2
     chatRefUser1 = query(
       doc(db, "users", userUid2, "chats", userUid2 + userUid1)
-    ),
+    ), // Создание запроса для чата пользователя 1
     chatRefUser2 = query(
       doc(db, "users", userUid1, "chats", userUid1 + userUid2)
-    );
+    ); // Создание запроса для чата пользователя 2
+
+  // Блокировка прокрутки body
   document.querySelector("body").style.overflow = "hidden";
 
+  // Прокрутка вниз при загрузке и обновлении сообщений
   useEffect(() => {
     const timer = setTimeout(() => {
       bottomRef.current?.scrollIntoView({ block: "end" });
@@ -78,6 +86,7 @@ const Chats = ({ dataChats }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Обновление idMessageList при изменении сообщений
   useEffect(() => {
     const f = onSnapshot(q, (querySnapshot) => {
       const data = querySnapshot.docs.map((e) => e.id);
@@ -87,8 +96,10 @@ const Chats = ({ dataChats }) => {
     });
   }, [q, idMessageList]);
 
+  // Получение закрепленного сообщения
   Pined(getDoc, doc, db, dataChats, idFromHref, setPined, setPinedIdMessage);
 
+  // Отправка сообщения
   const [countSend, setCountSend] = useState(false);
   const SendClick = async () => {
     if (countSend) return false;
@@ -113,6 +124,8 @@ const Chats = ({ dataChats }) => {
       setCountSend((prev) => (prev = false));
     }, [700]);
   };
+
+  // Обновление сообщения
   const [countUpdate, setCountUpdate] = useState(false);
   const UpdateClick = () => {
     if (countUpdate) return false;
@@ -139,6 +152,7 @@ const Chats = ({ dataChats }) => {
     }, [700]);
   };
 
+  // Отправка первого сообщения
   const sendFirstMessage = async () => {
     await addDoc(
       collection(db, "users", dataChats, "chats", idFromHref, "messages"),
@@ -163,7 +177,10 @@ const Chats = ({ dataChats }) => {
     });
   };
 
+  // Отображение загрузочного экрана
   if (loading) return <Preloader />;
+
+  // Основной JSX компонент
 
   return (
     <main>

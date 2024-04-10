@@ -1,3 +1,4 @@
+// Проверка, является ли строка валидным URL
 export const isURL = (str) => {
   try {
     new URL(str);
@@ -7,6 +8,7 @@ export const isURL = (str) => {
   }
 };
 
+// Функция для закрепления или открепления сообщения
 export const Consolidate = async (
   pinmess,
   del,
@@ -16,13 +18,16 @@ export const Consolidate = async (
   chatRefUser2,
   setModal
 ) => {
+  // Закрываем модальное окно
   setModal((prev) => (prev = false));
   if (!del) {
+    // Закрепляем сообщение в коллекции пользователя 1
     await updateDoc(chatRefUser1, {
       pined: pinmess,
       idMessage: id,
     });
 
+    // Если есть коллекция пользователя 2, закрепляем сообщение там
     if (chatRefUser2) {
       await updateDoc(chatRefUser2, {
         pined: pinmess,
@@ -30,15 +35,18 @@ export const Consolidate = async (
       });
     }
   } else {
+    // Если пользователь решил удалить закрепленное сообщение
     const resDel = window.confirm(
       "Вы действительно хотите удалить закрепленное сообщение?"
     );
     if (resDel) {
+      // Открепляем сообщение в коллекции пользователя 1
       await updateDoc(chatRefUser1, {
         pined: "",
         idMessage: "",
       });
 
+      // Если есть коллекция пользователя 2, открепляем сообщение там
       if (chatRefUser2) {
         await updateDoc(chatRefUser2, {
           pined: "",
@@ -49,6 +57,7 @@ export const Consolidate = async (
   }
 };
 
+// Функция для обновления текста сообщения
 export const UpdateButton = async (
   valueRewrite,
   updateDoc,
@@ -65,6 +74,7 @@ export const UpdateButton = async (
   setModeType
 ) => {
   if (valueRewrite.length === 0) return 0;
+  // Обновляем текст сообщения в коллекции
   await updateDoc(
     doc(db, "users", dataChats, "chats", idFromHref, "messages", idDoc),
     {
@@ -73,6 +83,7 @@ export const UpdateButton = async (
     }
   );
 
+  // Если сообщение последнее в чате, обновляем его в коллекциях пользователей
   if (
     document.getElementById(`#${Number(idMessage.replace("#", "")) + 1}`) ===
     null
@@ -86,6 +97,7 @@ export const UpdateButton = async (
     });
   }
 
+  // Если сообщение было закреплено, обновляем закрепленное сообщение в коллекциях пользователей
   if (idMessage === pinedIdMessage) {
     await updateDoc(chatRefUser1, {
       pined: valueRewrite.trim(),
@@ -98,10 +110,12 @@ export const UpdateButton = async (
     });
   }
 
+  // Сбрасываем значения
   setValueRewrite("");
   setModeType((prev) => (prev = true));
 };
 
+// Функция для обновления значения в режиме редактирования сообщения
 export const Update = (
   setModeType,
   messages,
@@ -117,6 +131,7 @@ export const Update = (
   setModalMessage((prev) => (prev = false));
 };
 
+// Функция для удаления сообщения
 export const DeleteButton = async (
   deleteDoc,
   doc,
@@ -136,12 +151,15 @@ export const DeleteButton = async (
   );
 
   if (resDel) {
+    // Удаляем сообщение из коллекции
     await deleteDoc(
       doc(db, "users", dataChats, "chats", idFromHref, "messages", value)
     );
 
+    // Если удаляемое сообщение последнее в чате, обновляем последнее сообщение в коллекциях пользователей
     if (
-      document.getElementById(`#${Number(idMessage.replace("#", ""))}`) === null
+      document.getElementById(`#${Number(idMessage.replace("#", ""))}`) ===
+      null
     ) {
       let res;
       if (
@@ -169,6 +187,7 @@ export const DeleteButton = async (
       });
     }
 
+    // Если удаляемое сообщение было закреплено, обновляем закрепленное сообщение в коллекциях пользователей
     if (idMessage === pinedIdMessage) {
       await updateDoc(chatRefUser1, {
         pined: "",
@@ -182,9 +201,11 @@ export const DeleteButton = async (
     }
   }
 
+  // Скрываем модальное окно
   setModalMessage((prev) => (prev = false));
 };
 
+// Функция для отправки сообщения
 export const Send = async (
   value,
   setValue,
@@ -206,6 +227,7 @@ export const Send = async (
     return 0;
   }
 
+  // Добавляем сообщение в коллекцию
   await addDoc(
     collection(db, "users", dataChats, "chats", idFromHref, "messages"),
     {
@@ -218,9 +240,11 @@ export const Send = async (
     }
   );
 
+  // Прокручиваем к последнему сообщению
   bottomRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
   setValue("");
 
+  // Обновляем текст последнего сообщения в коллекциях пользователей
   await updateDoc(chatRefUser1, {
     text: value.trim(),
     time: date,
@@ -232,6 +256,7 @@ export const Send = async (
   });
 };
 
+// Функция для получения закрепленного сообщения
 export const Pined = async (
   getDoc,
   doc,
@@ -241,11 +266,13 @@ export const Pined = async (
   setPined,
   setPinedIdMessage
 ) => {
+  // Получаем данные о закрепленном сообщении из коллекции
   const e = await getDoc(doc(db, "users", dataChats, "chats", idFromHref));
   setPined((prev) => (prev = e.data().pined));
   setPinedIdMessage((prev) => (prev = e.data().idMessage));
 };
 
+// Функция для форматирования даты
 export const DateFun = (data) => {
   const hours =
     data && data.toDate().getHours() < 10

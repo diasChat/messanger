@@ -1,3 +1,4 @@
+// Импорт необходимых компонентов и хуков
 import { Route, Routes, Navigate } from "react-router-dom";
 import React, { lazy, memo, Suspense } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -8,26 +9,33 @@ import { useState, useEffect } from "react";
 import Saved from "../chats/Saved";
 import ChatUsers from "../chats/Chat";
 import ErrorBoundary from "./ErrorBounds/ErrorBoundary";
+
+// Ленивая загрузка компонентов
 const Preloader = lazy(() => import("./Preloaders/Preloader")),
   Login = lazy(() => import("./Login")),
-  Menu = lazy(() => import("../menu/Menu")),
-  publicRoutes = [
-    {
-      path: "/login",
-      Component: Login,
-    },
-  ],
-  privateRoutes = [
-    {
-      path: "/saved",
-      Component: Saved,
-    },
-    {
-      path: "/",
-      Component: Menu,
-    },
-  ];
+  Menu = lazy(() => import("../menu/Menu"));
 
+// Публичные маршруты
+const publicRoutes = [
+  {
+    path: "/login",
+    Component: Login,
+  },
+];
+
+// Приватные маршруты
+const privateRoutes = [
+  {
+    path: "/saved",
+    Component: Saved,
+  },
+  {
+    path: "/",
+    Component: Menu,
+  },
+];
+
+// Компонент маршрутизатора приложения
 const AppRouter = memo(() => {
   const [user] = useAuthState(auth);
   let uid;
@@ -40,6 +48,7 @@ const AppRouter = memo(() => {
       query(collection(db, "users", uid, "chats"))
     );
 
+  // Обновление списка чатов пользователя при изменении
   useEffect(() => {
     if (chatsAll) {
       const data = chatsAll.map((data) => data.id);
@@ -50,6 +59,7 @@ const AppRouter = memo(() => {
     }
   }, [chatsAll]);
 
+  // Генерация маршрутов для каждого чата пользователя
   useEffect(() => {
     const userLinksObj = userLink.map((data, id) => ({
       id: id,
@@ -59,6 +69,7 @@ const AppRouter = memo(() => {
     setDataLinks((prev) => (prev = userLinksObj));
   }, [userLink]);
 
+  // Отображение маршрутов в зависимости от статуса авторизации пользователя
   return user ? (
     <Routes>
       {privateRoutes &&
@@ -112,4 +123,5 @@ const AppRouter = memo(() => {
   );
 });
 
+// Экспорт компонента AppRouter
 export default AppRouter;

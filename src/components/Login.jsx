@@ -15,28 +15,32 @@ const Copyright = () => {
   return (
     <div className={Style.copyright}>
       <p>{"Copyright © "}</p>
-      <p>Test</p>
+      <p>Chat IO</p>
       <p>{new Date().getFullYear()}</p>
     </div>
   );
 };
 
 const Login = () => {
+  // Получаем коллекцию пользователей
   const [users] = useCollectionData(
     query(collection(db, "users"), orderBy("createdAt", "asc"))
   );
 
+  // Функция для авторизации через Google
   const login = async () => {
     const provider = new GoogleAuthProvider();
     const { user } = await signInWithPopup(auth, provider);
 
-    let res = true;
+    let isNewUser = true;
+    // Проверяем, есть ли пользователь в коллекции
     users.forEach((data) => {
-      if (data.uid === user.uid) res = false;
+      if (data.uid === user.uid) isNewUser = false;
     });
 
-    if (res) {
-      const createCollect = async () => {
+    // Если пользователь новый, добавляем его в коллекцию
+    if (isNewUser) {
+      const createNewUser = async () => {
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           displayName: user.displayName,
@@ -44,7 +48,7 @@ const Login = () => {
           createdAt: Timestamp.fromDate(new Date()),
         });
       };
-      createCollect();
+      createNewUser();
     }
   };
 
